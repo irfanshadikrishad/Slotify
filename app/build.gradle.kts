@@ -60,3 +60,4 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
+apply(plugin = "com.google.gms.google-services")

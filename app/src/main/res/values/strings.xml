@@ -9,4 +9,7 @@
     <string name="confirm_password">Confirm password</string>
     <string name="dont_have_an_account_register">Don\'t have an account? Register.</string>
     <string name="already_have_an_account_login">Already have an account? Login.</string>
+    <string name="user_name">User Name</string>
+    <string name="user_email">User Email</string>
+    <string name="logout">Logout</string>
 </resources>

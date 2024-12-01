@@ -8,6 +8,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import io.irfanshadikrishad.slotify.MainActivity
 import io.irfanshadikrishad.slotify.R
 
 class RegisterActivity : AppCompatActivity() {
@@ -19,13 +22,20 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var registerButton: Button
     private lateinit var goToLogin: TextView
 
+    private lateinit var mAuth: FirebaseAuth  // Firebase Auth instance
+    private lateinit var db: FirebaseFirestore  // Firestore instance
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        // Initialize Firebase Auth and Firestore
+        mAuth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         // Initialize views
         nameInput = findViewById(R.id.register_name)
-        emailInput = findViewById(R.id.register_email) // Corrected id
+        emailInput = findViewById(R.id.register_email)
         passwordInput = findViewById(R.id.register_password)
         confirmPasswordInput = findViewById(R.id.register_password_2)
         registerButton = findViewById(R.id.button)
@@ -73,17 +83,45 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        // Simulate registration success
-        Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show()
-
-        // Redirect to LoginActivity after registration
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-        finish()
+        // Register user using Firebase Auth
+        registerUser(email, password, name)
     }
 
     private fun isValidEmail(email: String): Boolean {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email)
             .matches()
+    }
+
+    private fun registerUser(email: String, password: String, name: String) {
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                // Registration successful
+                val user = mAuth.currentUser
+                Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show()
+
+                // Store the user's name and other details in Firestore
+                val userMap = hashMapOf(
+                    "name" to name, "email" to email
+                )
+                user?.let {
+                    // Store the user's information under their user ID in Firestore
+                    db.collection("users").document(it.uid).set(userMap).addOnSuccessListener {
+                        // Redirect to LoginActivity after saving user data
+                        val intent = Intent(this, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()  // Finish RegisterActivity
+                    }.addOnFailureListener { e ->
+                        Toast.makeText(
+                            this, "Error saving user data: ${e.message}", Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } else {
+                // If registration fails, display a message to the user
+                Toast.makeText(
+                    this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 }
