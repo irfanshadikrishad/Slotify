@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "649141245606",
+    "project_id": "slotify-x",
+    "storage_bucket": "slotify-x.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649141245606:android:449caf298386acbbd1c667",
+        "android_client_info": {
+          "package_name": "io.irfanshadikrishad.slotify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9901nrVH7M40LDvpHAYlH9OL3Ez1SOak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
