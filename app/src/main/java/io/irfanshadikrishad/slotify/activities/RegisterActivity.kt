@@ -107,7 +107,7 @@ class RegisterActivity : AppCompatActivity() {
                     // Store the user's information under their user ID in Firestore
                     db.collection("users").document(it.uid).set(userMap).addOnSuccessListener {
                         // Redirect to LoginActivity after saving user data
-                        val intent = Intent(this, LoginActivity::class.java)
+                        val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
                         finish()  // Finish RegisterActivity
                     }.addOnFailureListener { e ->
