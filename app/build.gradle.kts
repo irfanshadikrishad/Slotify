@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "io.irfanshadikrishad.slotify"
-        minSdk = 23
+        minSdk = 28
         //noinspection OldTargetApi
         targetSdk = 33
         versionCode = 1
@@ -42,6 +42,14 @@ dependencies {
     // FIREBASE
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.google.firebase.database.ktx)
+    implementation(libs.firebase.core)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.firestore)
+    implementation(libs.play.services.auth)
+
+    //To manage permission
+    implementation(libs.dexter)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
