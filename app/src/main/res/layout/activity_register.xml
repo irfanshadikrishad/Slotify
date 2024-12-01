@@ -24,7 +24,6 @@
             android:textSize="35sp" />
 
         <!-- Name Input -->
-        <!-- Email Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/register_layout_3"
             android:layout_width="match_parent"
@@ -37,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/your_name"
-                android:inputType="textEmailAddress" />
+                android:inputType="textPersonName" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Email Input -->
@@ -49,7 +48,7 @@
             android:layout_marginTop="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/login_email"
+                android:id="@+id/register_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/your_email"
@@ -98,6 +97,15 @@
             android:layout_marginEnd="15dp"
             android:text="@string/register"
             android:textSize="20sp" />
+
+        <!-- Redirect to login -->
+        <TextView
+            android:id="@+id/go_to_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/already_have_an_account_login"
+            android:textSize="15sp" />
 
     </LinearLayout>
 
