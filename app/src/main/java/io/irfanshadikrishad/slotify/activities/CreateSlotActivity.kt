@@ -103,8 +103,6 @@ class CreateSlotActivity : AppCompatActivity() {
         }
 
         val adminId = auth.currentUser?.uid
-        Log.i("cs1087", "createSlot $adminId")
-
         // Validate if the new slot overlaps with any existing ones
         db.collection("slots").whereEqualTo("date", selectedDate).get()
             .addOnSuccessListener { documents ->
@@ -136,11 +134,9 @@ class CreateSlotActivity : AppCompatActivity() {
                 )
 
                 db.collection("slots").add(slot).addOnSuccessListener {
-                    Log.i("cs1087", "createSlot add functionality called")
                     Toast.makeText(this, "Slot created successfully!", Toast.LENGTH_SHORT).show()
                     finish()
                 }.addOnFailureListener {
-                    Log.i("cs1087", "createSlot add slot failed called")
                     Toast.makeText(this, "Failed to create slot", Toast.LENGTH_SHORT).show()
                 }
             }

@@ -7,9 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import io.irfanshadikrishad.slotify.R
+import io.irfanshadikrishad.slotify.activities.ViewSlotActivity
 import io.irfanshadikrishad.slotify.models.Slot
 
 class SlotAdapter(private val context: Context, private val slotList: List<Slot>) :
@@ -43,14 +43,19 @@ class SlotAdapter(private val context: Context, private val slotList: List<Slot>
         holder.bookedByTextView.text =
             if (slot.bookedBy != null) "Booked By: ${slot.bookedBy}" else "Available"
 
-        // Click Listener
+        // Click Listener: Open ViewSlotActivity
         holder.itemView.setOnClickListener {
             Log.i("sa1087", "Slot clicked - ID: ${slot.id}, AdminID: ${slot.adminId}")
 
-            Toast.makeText(
-                context, "Slot selected: ${slot.date} ${slot.startTime}", Toast.LENGTH_SHORT
-            ).show()
-
+            try {
+                val intent = Intent(context, ViewSlotActivity::class.java).apply {
+                    putExtra("slotId", slot.id)
+                    putExtra("adminId", slot.adminId)
+                }
+                context.startActivity(intent)
+            } catch (error: Exception) {
+                Log.i("sa1087", "Error ${error.toString()}")
+            }
         }
     }
 

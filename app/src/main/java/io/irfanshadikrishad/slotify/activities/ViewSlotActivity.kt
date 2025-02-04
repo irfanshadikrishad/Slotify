@@ -61,47 +61,45 @@ class ViewSlotActivity : AppCompatActivity() {
     }
 
     private fun loadSlotDetails() {
-        db.collection("slots").document(slotId!!).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val date = document.getString("date") ?: ""
-                    val startTime = document.getString("startTime") ?: ""
-                    val endTime = document.getString("endTime") ?: ""
-                    bookedBy = document.getString("bookedBy")
+        db.collection("slots").document(slotId!!).get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val date = document.getString("date") ?: ""
+                val startTime = document.getString("startTime") ?: ""
+                val endTime = document.getString("endTime") ?: ""
+                bookedBy = document.getString("bookedBy")
 
-                    dateTextView.text = buildString {
-                        append("Date: ")
-                        append(date)
-                    }
-                    timeTextView.text = buildString {
-                        append("Time: ")
-                        append(startTime)
-                        append(" - ")
-                        append(endTime)
-                    }
+                dateTextView.text = buildString {
+                    append("Date: ")
+                    append(date)
+                }
+                timeTextView.text = buildString {
+                    append("Time: ")
+                    append(startTime)
+                    append(" - ")
+                    append(endTime)
+                }
 
-                    isBooked = bookedBy != null
-                    bookedByTextView.text = if (isBooked) "Booked by: $bookedBy" else "Available"
+                isBooked = bookedBy != null
+                bookedByTextView.text = if (isBooked) "Booked by: $bookedBy" else "Available"
 
-                    // Determine if user is an admin or a regular user
-                    if (currentUserId == slotAdminId) {
-                        // Admin: Show edit & delete buttons
-                        editButton.visibility = Button.VISIBLE
-                        deleteButton.visibility = Button.VISIBLE
-                        actionButton.visibility = Button.GONE
-                    } else {
-                        // Regular user: Show book/unbook button
-                        editButton.visibility = Button.GONE
-                        deleteButton.visibility = Button.GONE
-                        actionButton.visibility = Button.VISIBLE
-                        actionButton.text =
-                            if (isBooked && bookedBy == currentUserId) "Unbook Slot" else "Book Slot"
-                    }
+                // Determine if user is an admin or a regular user
+                if (currentUserId == slotAdminId) {
+                    // Admin: Show edit & delete buttons
+                    editButton.visibility = Button.VISIBLE
+                    deleteButton.visibility = Button.VISIBLE
+                    actionButton.visibility = Button.GONE
+                } else {
+                    // Regular user: Show book/unbook button
+                    editButton.visibility = Button.GONE
+                    deleteButton.visibility = Button.GONE
+                    actionButton.visibility = Button.VISIBLE
+                    actionButton.text =
+                        if (isBooked && bookedBy == currentUserId) "Unbook Slot" else "Book Slot"
                 }
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to load slot", Toast.LENGTH_SHORT).show()
-            }
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to load slot", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun toggleBooking() {
@@ -111,8 +109,7 @@ class ViewSlotActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Slot unbooked", Toast.LENGTH_SHORT).show()
                     finish()
-                }
-                .addOnFailureListener {
+                }.addOnFailureListener {
                     Toast.makeText(this, "Failed to unbook", Toast.LENGTH_SHORT).show()
                 }
         } else if (!isBooked) {
@@ -121,8 +118,7 @@ class ViewSlotActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Slot booked", Toast.LENGTH_SHORT).show()
                     finish()
-                }
-                .addOnFailureListener {
+                }.addOnFailureListener {
                     Toast.makeText(this, "Failed to book", Toast.LENGTH_SHORT).show()
                 }
         }
@@ -136,22 +132,17 @@ class ViewSlotActivity : AppCompatActivity() {
     }
 
     private fun confirmDeleteSlot() {
-        AlertDialog.Builder(this)
-            .setTitle("Delete Slot")
+        AlertDialog.Builder(this).setTitle("Delete Slot")
             .setMessage("Are you sure you want to delete this slot?")
-            .setPositiveButton("Yes") { _, _ -> deleteSlot() }
-            .setNegativeButton("No", null)
-            .show()
+            .setPositiveButton("Yes") { _, _ -> deleteSlot() }.setNegativeButton("No", null).show()
     }
 
     private fun deleteSlot() {
-        db.collection("slots").document(slotId!!).delete()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Slot deleted", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to delete slot", Toast.LENGTH_SHORT).show()
-            }
+        db.collection("slots").document(slotId!!).delete().addOnSuccessListener {
+            Toast.makeText(this, "Slot deleted", Toast.LENGTH_SHORT).show()
+            finish()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to delete slot", Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -8,46 +8,45 @@
         android:id="@+id/selectDateButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Date" />
+        android:text="@string/select_date" />
 
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No Date Selected"
+        android:text="@string/no_date_selected"
         android:textSize="16sp" />
 
     <Button
         android:id="@+id/selectStartTimeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Start Time" />
+        android:text="@string/select_start_time" />
 
     <TextView
         android:id="@+id/startTimeTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No Start Time Selected"
+        android:text="@string/no_start_time_selected"
         android:textSize="16sp" />
 
     <Button
         android:id="@+id/selectEndTimeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select End Time" />
+        android:text="@string/select_end_time" />
 
     <TextView
         android:id="@+id/endTimeTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No End Time Selected"
+        android:text="@string/no_end_time_selected"
         android:textSize="16sp" />
 
     <Button
         android:id="@+id/createSlotButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create Slot" />
-
+        android:text="@string/create_slot" />
 
 </LinearLayout>

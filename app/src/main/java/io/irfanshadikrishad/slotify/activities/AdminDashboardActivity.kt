@@ -60,7 +60,7 @@ class AdminDashboardActivity : AppCompatActivity() {
                     )
                     slotList.add(slot)
                 }
-                
+
                 slotAdapter = SlotAdapter(this, slotList)
                 slotRecyclerView.adapter = slotAdapter
             }.addOnFailureListener { e ->

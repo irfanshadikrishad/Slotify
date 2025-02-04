@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:background="@android:color/holo_red_light"
+        android:backgroundTint="@color/error"
         android:text="@string/delete_slot"
         android:visibility="gone" />
 </LinearLayout>

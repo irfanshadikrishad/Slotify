@@ -29,6 +29,7 @@
         <activity android:name=".activities.AdminDashboardActivity" />
         <activity android:name=".activities.UserDashboardActivity" />
         <activity android:name=".activities.CreateSlotActivity" />
+        <activity android:name=".activities.ViewSlotActivity" />
 
     </application>
 </manifest>

@@ -26,6 +26,12 @@
     <string name="book_slot">Book Slot</string>
     <string name="edit_slot">Edit Slot</string>
     <string name="delete_slot">Delete Slot</string>
+    <string name="select_date">Select Date</string>
+    <string name="no_date_selected">No Date Selected</string>
+    <string name="select_start_time">Select Start Time</string>
+    <string name="no_start_time_selected">No Start Time Selected</string>
+    <string name="select_end_time">Select End Time</string>
+    <string name="no_end_time_selected">No End Time Selected</string>
     <string-array name="user_roles">
         <item>User</item>
         <item>Admin</item>
