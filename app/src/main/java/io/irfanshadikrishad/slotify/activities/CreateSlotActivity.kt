@@ -113,6 +113,7 @@ class CreateSlotActivity : AppCompatActivity() {
     }
 
     private fun createOrUpdateSlot() {
+        // Check if the selected values are null or empty
         val date =
             selectedDate ?: dateTextView.text.toString().replace("Selected Date: ", "").trim()
         val startTime =
@@ -122,8 +123,10 @@ class CreateSlotActivity : AppCompatActivity() {
             selectedEndTime ?: endTimeTextView.text.toString().replace("End Time: ", "").trim()
         val adminId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
+        // If any of the fields are empty, show a toast asking the user to fill all fields
         if (date.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please select a date and time for all fields", Toast.LENGTH_SHORT)
+                .show()
             return
         }
 
@@ -175,11 +178,18 @@ class CreateSlotActivity : AppCompatActivity() {
         newStart: String, newEnd: String, existingStart: String, existingEnd: String
     ): Boolean {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val newStartTime = timeFormat.parse(newStart)!!.time
-        val newEndTime = timeFormat.parse(newEnd)!!.time
-        val existingStartTime = timeFormat.parse(existingStart)!!.time
-        val existingEndTime = timeFormat.parse(existingEnd)!!.time
 
-        return (newStartTime < existingEndTime && newEndTime > existingStartTime)
+        try {
+            val newStartTime = timeFormat.parse(newStart)?.time ?: return false
+            val newEndTime = timeFormat.parse(newEnd)?.time ?: return false
+            val existingStartTime = timeFormat.parse(existingStart)?.time ?: return false
+            val existingEndTime = timeFormat.parse(existingEnd)?.time ?: return false
+
+            return (newStartTime < existingEndTime && newEndTime > existingStartTime)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
     }
+
 }
