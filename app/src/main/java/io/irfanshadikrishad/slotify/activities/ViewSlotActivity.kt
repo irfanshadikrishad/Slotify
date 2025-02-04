@@ -127,6 +127,12 @@ class ViewSlotActivity : AppCompatActivity() {
     private fun editSlot() {
         val intent = Intent(this, CreateSlotActivity::class.java).apply {
             putExtra("slotId", slotId)
+            putExtra("date", dateTextView.text.toString().removePrefix("Date: "))
+            putExtra(
+                "startTime",
+                timeTextView.text.toString().split(" - ")[0].removePrefix("Time: ")
+            )
+            putExtra("endTime", timeTextView.text.toString().split(" - ")[1])
         }
         startActivity(intent)
     }

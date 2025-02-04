@@ -2,11 +2,11 @@ package io.irfanshadikrishad.slotify.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import io.irfanshadikrishad.slotify.R
 import io.irfanshadikrishad.slotify.activities.ViewSlotActivity
@@ -45,8 +45,6 @@ class SlotAdapter(private val context: Context, private val slotList: List<Slot>
 
         // Click Listener: Open ViewSlotActivity
         holder.itemView.setOnClickListener {
-            Log.i("sa1087", "Slot clicked - ID: ${slot.id}, AdminID: ${slot.adminId}")
-
             try {
                 val intent = Intent(context, ViewSlotActivity::class.java).apply {
                     putExtra("slotId", slot.id)
@@ -54,7 +52,10 @@ class SlotAdapter(private val context: Context, private val slotList: List<Slot>
                 }
                 context.startActivity(intent)
             } catch (error: Exception) {
-                Log.i("sa1087", "Error ${error.toString()}")
+                Toast.makeText(context, buildString {
+                    append("Error: ")
+                    append(error.toString())
+                }, Toast.LENGTH_SHORT).show()
             }
         }
     }
