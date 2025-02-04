@@ -1,0 +1,25 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <Button
+        android:id="@+id/createSlotButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_slot" />
+
+    <TextView
+        android:id="@+id/slotListTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:text="@string/created_slots"
+        android:textSize="18sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/slotRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -2,92 +2,66 @@ package io.irfanshadikrishad.slotify.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
-import io.irfanshadikrishad.slotify.MainActivity
+import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var emailInput: TextInputEditText
-    private lateinit var passwordInput: TextInputEditText
-    private lateinit var loginButton: Button
-    private lateinit var goToRegister: TextView
-
-    private lateinit var mAuth: FirebaseAuth  // Firebase Auth instance
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.login)
 
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance()
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
-        // Initialize views
-        emailInput = findViewById(R.id.login_email)
-        passwordInput = findViewById(R.id.login_password)
-        loginButton = findViewById(R.id.button)
-        goToRegister = findViewById(R.id.go_to_register)
+        val emailEditText = findViewById<EditText>(R.id.emailEditText)
+        val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
+        val loginButton = findViewById<Button>(R.id.loginButton)
+        val registerLink = findViewById<TextView>(R.id.registerLink)
 
-        // Set up login button click listener
         loginButton.setOnClickListener {
-            validateInputsAndSignIn()
-        }
+            val email = emailEditText.text.toString().trim()
+            val password = passwordEditText.text.toString().trim()
 
-        // Set up redirection to RegisterActivity
-        goToRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
-        }
-    }
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val userId = auth.currentUser?.uid
+                        db.collection("users").document(userId!!).get()
+                            .addOnSuccessListener { document ->
+                                val role = document.getString("role") ?: "user"
+                                val name = document.getString("name") ?: ""
+                                val orgName = document.getString("organization") ?: ""
 
-    private fun validateInputsAndSignIn() {
-        val email = emailInput.text?.toString()?.trim() ?: ""
-        val password = passwordInput.text?.toString()?.trim() ?: ""
+                                Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT).show()
 
-        // Validate email
-        if (!isValidEmail(email)) {
-            emailInput.error = "Please enter a valid email address"
-            return
-        }
-
-        // Validate password
-        if (password.isEmpty()) {
-            passwordInput.error = "Password cannot be empty"
-            return
-        }
-
-        // Sign in user using Firebase Auth
-        signInUser(email, password)
-    }
-
-    private fun isValidEmail(email: String): Boolean {
-        return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email)
-            .matches()
-    }
-
-    private fun signInUser(email: String, password: String) {
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                // Sign-in successful
-                val user = mAuth.currentUser
-                Toast.makeText(this, "Welcome back, ${user?.email}!", Toast.LENGTH_SHORT).show()
-
-                // Redirect to the main activity or home screen
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()  // Finish LoginActivity
-            } else {
-                // If sign-in fails, display a message to the user
-                Toast.makeText(
-                    this, "Sign-in failed: ${task.exception?.message}", Toast.LENGTH_LONG
-                ).show()
+                                navigateBasedOnRole(role)
+                            }
+                    } else {
+                        Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
+
+        registerLink.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+        }
+    }
+
+    private fun navigateBasedOnRole(role: String) {
+        val intent = if (role == "admin") {
+            Intent(this, AdminDashboardActivity::class.java)
+        } else {
+            Intent(this, UserDashboardActivity::class.java)
+        }
+        startActivity(intent)
+        finish()
     }
 }

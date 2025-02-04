@@ -1,5 +1,5 @@
 [versions]
-agp = "8.6.0"
+agp = "8.8.0"
 dexter = "6.2.2"
 firebaseBom = "33.6.0"
 firebaseCore = "21.1.1"

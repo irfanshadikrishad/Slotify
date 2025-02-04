@@ -12,4 +12,19 @@
     <string name="user_name">User Name</string>
     <string name="user_email">User Email</string>
     <string name="logout">Logout</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="create_slot">Create Slot</string>
+    <string name="created_slots">Created Slots</string>
+    <string name="available_slots">Available Slots</string>
+    <string name="save_slot">Save Slot</string>
+    <string name="enter_slot_time_e_g_10_00_am_11_00_am">Enter Slot Time (e.g., 10:00 AM - 11:00 AM)</string>
+    <string name="don_t_have_an_account_register_here">Don\'t have an account? Register here.</string>
+    <string name="already_have_an_account_login_here">Already have an account? Login here.</string>
+    <string name="enter_organization_name_admin_only">Enter organization name (Admin only)</string>
+    <string name="name">Name</string>
+    <string-array name="user_roles">
+        <item>User</item>
+        <item>Admin</item>
+    </string-array>
 </resources>

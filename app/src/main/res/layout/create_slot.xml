@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/slotTimeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:hint="@string/enter_slot_time_e_g_10_00_am_11_00_am"
+        android:inputType="date" />
+
+    <Button
+        android:id="@+id/saveSlotButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/save_slot" />
+</LinearLayout>
