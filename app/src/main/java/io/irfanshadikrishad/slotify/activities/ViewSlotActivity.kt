@@ -60,6 +60,12 @@ class ViewSlotActivity : AppCompatActivity() {
         deleteButton.setOnClickListener { confirmDeleteSlot() }
     }
 
+    // For refreshing slot after edit
+    override fun onResume() {
+        super.onResume()
+        loadSlotDetails()
+    }
+
     private fun loadSlotDetails() {
         db.collection("slots").document(slotId!!).get().addOnSuccessListener { document ->
             if (document.exists()) {
@@ -129,8 +135,7 @@ class ViewSlotActivity : AppCompatActivity() {
             putExtra("slotId", slotId)
             putExtra("date", dateTextView.text.toString().removePrefix("Date: "))
             putExtra(
-                "startTime",
-                timeTextView.text.toString().split(" - ")[0].removePrefix("Time: ")
+                "startTime", timeTextView.text.toString().split(" - ")[0].removePrefix("Time: ")
             )
             putExtra("endTime", timeTextView.text.toString().split(" - ")[1])
         }
