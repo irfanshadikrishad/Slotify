@@ -26,8 +26,6 @@
         <!-- Other Activities -->
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.RegisterActivity" />
-        <activity android:name=".activities.AdminDashboardActivity" />
-        <activity android:name=".activities.UserDashboardActivity" />
         <activity android:name=".activities.CreateSlotActivity" />
         <activity android:name=".activities.ViewSlotActivity" />
 

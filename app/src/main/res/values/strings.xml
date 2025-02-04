@@ -32,6 +32,9 @@
     <string name="no_start_time_selected">No Start Time Selected</string>
     <string name="select_end_time">Select End Time</string>
     <string name="no_end_time_selected">No End Time Selected</string>
+    <string name="notifications">Notifications</string>
+    <string name="profile">Profile</string>
+    <string name="home">Home</string>
     <string-array name="user_roles">
         <item>User</item>
         <item>Admin</item>
