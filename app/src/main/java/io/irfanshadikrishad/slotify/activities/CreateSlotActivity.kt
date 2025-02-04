@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -28,6 +27,7 @@ class CreateSlotActivity : AppCompatActivity() {
     private var selectedDate: String? = null
     private var selectedStartTime: String? = null
     private var selectedEndTime: String? = null
+    private var slotId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +49,24 @@ class CreateSlotActivity : AppCompatActivity() {
         selectStartTimeButton.setOnClickListener { showTimePicker(true) }
         selectEndTimeButton.setOnClickListener { showTimePicker(false) }
 
-        createSlotButton.setOnClickListener { createSlot() }
+        createSlotButton.setOnClickListener { createOrUpdateSlot() }
+
+        slotId = intent.getStringExtra("slotId")
+
+        if (slotId != null) {
+            // Editing an existing slot
+            val date = intent.getStringExtra("date") ?: ""
+            val startTime = intent.getStringExtra("startTime") ?: ""
+            val endTime = intent.getStringExtra("endTime") ?: ""
+
+            dateTextView.text = date
+            startTimeTextView.text = startTime
+            endTimeTextView.text = endTime
+
+            createSlotButton.text = buildString {
+                append("Update Slot")
+            }
+        }
     }
 
     private fun showDatePicker() {
@@ -95,51 +112,65 @@ class CreateSlotActivity : AppCompatActivity() {
         timePicker.show()
     }
 
-    private fun createSlot() {
-        Log.i("cs1087", "createSlot called")
-        if (selectedDate == null || selectedStartTime == null || selectedEndTime == null) {
-            Toast.makeText(this, "Please select date and time range", Toast.LENGTH_SHORT).show()
+    private fun createOrUpdateSlot() {
+        // Check if the selected values are null or empty
+        val date =
+            selectedDate ?: dateTextView.text.toString().replace("Selected Date: ", "").trim()
+        val startTime =
+            selectedStartTime ?: startTimeTextView.text.toString().replace("Start Time: ", "")
+                .trim()
+        val endTime =
+            selectedEndTime ?: endTimeTextView.text.toString().replace("End Time: ", "").trim()
+        val adminId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        // If any of the fields are empty, show a toast asking the user to fill all fields
+        if (date.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
+            Toast.makeText(this, "Please select a date and time for all fields", Toast.LENGTH_SHORT)
+                .show()
             return
         }
 
-        val adminId = auth.currentUser?.uid
-        // Validate if the new slot overlaps with any existing ones
-        db.collection("slots").whereEqualTo("date", selectedDate).get()
-            .addOnSuccessListener { documents ->
-                Log.i("cs1087", "createSlot on success listener called")
-                for (document in documents) {
-                    val existingStart = document.getString("startTime")
-                    val existingEnd = document.getString("endTime")
+        // Query existing slots for the same date
+        db.collection("slots").whereEqualTo("date", date).get().addOnSuccessListener { result ->
+            for (document in result) {
+                if (slotId != null && document.id == slotId) continue // Ignore the same slot if editing
 
-                    if (existingStart != null && existingEnd != null) {
-                        if (isTimeOverlap(
-                                selectedStartTime!!, selectedEndTime!!, existingStart, existingEnd
-                            )
-                        ) {
-                            Toast.makeText(
-                                this, "Slot time conflicts with an existing slot", Toast.LENGTH_LONG
-                            ).show()
-                            return@addOnSuccessListener
-                        }
-                    }
+                val existingStartTime = document.getString("startTime") ?: continue
+                val existingEndTime = document.getString("endTime") ?: continue
+
+                // Check for time overlap
+                if (isTimeOverlap(startTime, endTime, existingStartTime, existingEndTime)) {
+                    Toast.makeText(this, "Time overlaps with another slot", Toast.LENGTH_SHORT)
+                        .show()
+                    return@addOnSuccessListener
                 }
+            }
 
-                // If no conflicts, add the slot
-                val slot = hashMapOf(
-                    "adminId" to adminId,
-                    "date" to selectedDate,
-                    "startTime" to selectedStartTime,
-                    "endTime" to selectedEndTime,
-                    "bookedBy" to null
-                )
+            val slotData = hashMapOf(
+                "adminId" to adminId, "date" to date, "startTime" to startTime, "endTime" to endTime
+            )
 
-                db.collection("slots").add(slot).addOnSuccessListener {
-                    Toast.makeText(this, "Slot created successfully!", Toast.LENGTH_SHORT).show()
+            if (slotId == null) {
+                // Create new slot
+                db.collection("slots").add(slotData).addOnSuccessListener {
+                    Toast.makeText(this, "Slot created successfully", Toast.LENGTH_SHORT).show()
                     finish()
                 }.addOnFailureListener {
                     Toast.makeText(this, "Failed to create slot", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                // Update existing slot
+                db.collection("slots").document(slotId!!).update(slotData as Map<String, Any>)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Slot updated successfully", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }.addOnFailureListener {
+                        Toast.makeText(this, "Failed to update slot", Toast.LENGTH_SHORT).show()
+                    }
             }
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to check existing slots", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // Helper function to check time overlap
@@ -147,11 +178,18 @@ class CreateSlotActivity : AppCompatActivity() {
         newStart: String, newEnd: String, existingStart: String, existingEnd: String
     ): Boolean {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val newStartTime = timeFormat.parse(newStart)!!.time
-        val newEndTime = timeFormat.parse(newEnd)!!.time
-        val existingStartTime = timeFormat.parse(existingStart)!!.time
-        val existingEndTime = timeFormat.parse(existingEnd)!!.time
 
-        return (newStartTime < existingEndTime && newEndTime > existingStartTime)
+        try {
+            val newStartTime = timeFormat.parse(newStart)?.time ?: return false
+            val newEndTime = timeFormat.parse(newEnd)?.time ?: return false
+            val existingStartTime = timeFormat.parse(existingStart)?.time ?: return false
+            val existingEndTime = timeFormat.parse(existingEnd)?.time ?: return false
+
+            return (newStartTime < existingEndTime && newEndTime > existingStartTime)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
     }
+
 }

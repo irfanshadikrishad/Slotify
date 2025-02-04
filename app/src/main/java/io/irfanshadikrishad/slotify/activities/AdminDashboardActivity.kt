@@ -1,5 +1,6 @@
 package io.irfanshadikrishad.slotify.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -36,9 +37,17 @@ class AdminDashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, CreateSlotActivity::class.java))
         }
 
+        // Fetch slots initially when the activity is created
         fetchSlots()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Re-fetch the slots whenever the activity is resumed
+        fetchSlots()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
     private fun fetchSlots() {
         val adminId = auth.currentUser?.uid
         if (adminId == null) {
@@ -61,8 +70,13 @@ class AdminDashboardActivity : AppCompatActivity() {
                     slotList.add(slot)
                 }
 
-                slotAdapter = SlotAdapter(this, slotList)
-                slotRecyclerView.adapter = slotAdapter
+                // Update the adapter with the refreshed list
+                if (::slotAdapter.isInitialized) {
+                    slotAdapter.notifyDataSetChanged()
+                } else {
+                    slotAdapter = SlotAdapter(this, slotList)
+                    slotRecyclerView.adapter = slotAdapter
+                }
             }.addOnFailureListener { e ->
                 Log.e("AdminDashboard", "Error fetching slots", e)
                 Toast.makeText(this, "Failed to load slots", Toast.LENGTH_SHORT).show()
