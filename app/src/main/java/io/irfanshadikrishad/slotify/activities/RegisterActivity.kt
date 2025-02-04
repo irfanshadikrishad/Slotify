@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
+import io.irfanshadikrishad.slotify.fragments.AdminDashboardFragment
+import io.irfanshadikrishad.slotify.fragments.UserDashboardFragment
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -31,9 +33,7 @@ class RegisterActivity : AppCompatActivity() {
 
         // Populate role spinner
         ArrayAdapter.createFromResource(
-            this,
-            R.array.user_roles,
-            android.R.layout.simple_spinner_item
+            this, R.array.user_roles, android.R.layout.simple_spinner_item
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             roleSpinner.adapter = adapter
@@ -42,10 +42,7 @@ class RegisterActivity : AppCompatActivity() {
         // Show organization name field only if role is Admin
         roleSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
                 val selectedRole = roleSpinner.selectedItem.toString().lowercase()
                 orgEditText.visibility = if (selectedRole == "admin") View.VISIBLE else View.GONE
@@ -66,8 +63,7 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
+            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid
                         if (userId != null) {
@@ -78,9 +74,7 @@ class RegisterActivity : AppCompatActivity() {
                                 "organization" to if (role == "admin") orgName else null
                             )
 
-                            db.collection("users").document(userId)
-                                .set(user)
-                                .addOnSuccessListener {
+                            db.collection("users").document(userId).set(user).addOnSuccessListener {
                                     navigateBasedOnRole(role)
                                 }
                         }
@@ -97,9 +91,9 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun navigateBasedOnRole(role: String) {
         val intent = if (role == "admin") {
-            Intent(this, AdminDashboardActivity::class.java)
+            Intent(this, AdminDashboardFragment::class.java)
         } else {
-            Intent(this, UserDashboardActivity::class.java)
+            Intent(this, UserDashboardFragment::class.java)
         }
         startActivity(intent)
         finish()

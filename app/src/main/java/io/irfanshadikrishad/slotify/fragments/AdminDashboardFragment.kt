@@ -1,21 +1,25 @@
-package io.irfanshadikrishad.slotify.activities
+package io.irfanshadikrishad.slotify.fragments
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
+import io.irfanshadikrishad.slotify.activities.CreateSlotActivity
 import io.irfanshadikrishad.slotify.adapters.SlotAdapter
 import io.irfanshadikrishad.slotify.models.Slot
 
-class AdminDashboardActivity : AppCompatActivity() {
+class AdminDashboardFragment : Fragment() {
 
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
@@ -23,27 +27,30 @@ class AdminDashboardActivity : AppCompatActivity() {
     private lateinit var slotAdapter: SlotAdapter
     private val slotList = mutableListOf<Slot>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.admin_dashboard)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.admin_dashboard, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        slotRecyclerView = findViewById(R.id.slotRecyclerView)
-        slotRecyclerView.layoutManager = LinearLayoutManager(this)
+        slotRecyclerView = view.findViewById(R.id.slotRecyclerView)
+        slotRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        findViewById<Button>(R.id.createSlotButton).setOnClickListener {
-            startActivity(Intent(this, CreateSlotActivity::class.java))
+        view.findViewById<Button>(R.id.createSlotButton).setOnClickListener {
+            startActivity(Intent(requireContext(), CreateSlotActivity::class.java))
         }
 
-        // Fetch slots initially when the activity is created
         fetchSlots()
     }
 
     override fun onResume() {
         super.onResume()
-        // Re-fetch the slots whenever the activity is resumed
         fetchSlots()
     }
 
@@ -51,12 +58,16 @@ class AdminDashboardActivity : AppCompatActivity() {
     private fun fetchSlots() {
         val adminId = auth.currentUser?.uid
         if (adminId == null) {
-            Toast.makeText(this, "Error: Admin not logged in", Toast.LENGTH_SHORT).show()
+            context?.let { ctx ->
+                Toast.makeText(ctx, "Error: Admin not logged in", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
         db.collection("slots").whereEqualTo("adminId", adminId).get()
             .addOnSuccessListener { documents ->
+                if (!isAdded || context == null) return@addOnSuccessListener
+
                 slotList.clear()
                 for (document in documents) {
                     val slot = Slot(
@@ -69,17 +80,24 @@ class AdminDashboardActivity : AppCompatActivity() {
                     )
                     slotList.add(slot)
                 }
-
-                // Update the adapter with the refreshed list
-                if (::slotAdapter.isInitialized) {
-                    slotAdapter.notifyDataSetChanged()
-                } else {
-                    slotAdapter = SlotAdapter(this, slotList)
-                    slotRecyclerView.adapter = slotAdapter
+                if (isAdded) {
+                    if (::slotAdapter.isInitialized) {
+                        slotAdapter.notifyDataSetChanged()
+                    } else {
+                        context?.let { ctx ->
+                            slotAdapter = SlotAdapter(ctx, slotList)
+                            slotRecyclerView.adapter = slotAdapter
+                        }
+                    }
                 }
             }.addOnFailureListener { e ->
-                Log.e("AdminDashboard", "Error fetching slots", e)
-                Toast.makeText(this, "Failed to load slots", Toast.LENGTH_SHORT).show()
+                if (isAdded) {
+                    Log.e("AdminDashboardFragment", "Error fetching slots", e)
+                    context?.let { ctx ->
+                        Toast.makeText(ctx, "Failed to load slots", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
     }
+
 }

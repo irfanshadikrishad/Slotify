@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
+import io.irfanshadikrishad.slotify.fragments.AdminDashboardFragment
+import io.irfanshadikrishad.slotify.fragments.UserDashboardFragment
 
 class LoginActivity : AppCompatActivity() {
 
@@ -57,9 +59,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun navigateBasedOnRole(role: String) {
         val intent = if (role == "admin") {
-            Intent(this, AdminDashboardActivity::class.java)
+            Intent(this, AdminDashboardFragment::class.java)
         } else {
-            Intent(this, UserDashboardActivity::class.java)
+            Intent(this, UserDashboardFragment::class.java)
         }
         startActivity(intent)
         finish()
