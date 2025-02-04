@@ -58,13 +58,16 @@ class AdminDashboardFragment : Fragment() {
     private fun fetchSlots() {
         val adminId = auth.currentUser?.uid
         if (adminId == null) {
-            Toast.makeText(requireContext(), "Error: Admin not logged in", Toast.LENGTH_SHORT)
-                .show()
+            context?.let { ctx ->
+                Toast.makeText(ctx, "Error: Admin not logged in", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
         db.collection("slots").whereEqualTo("adminId", adminId).get()
             .addOnSuccessListener { documents ->
+                if (!isAdded || context == null) return@addOnSuccessListener
+
                 slotList.clear()
                 for (document in documents) {
                     val slot = Slot(
@@ -77,16 +80,24 @@ class AdminDashboardFragment : Fragment() {
                     )
                     slotList.add(slot)
                 }
-
-                if (::slotAdapter.isInitialized) {
-                    slotAdapter.notifyDataSetChanged()
-                } else {
-                    slotAdapter = SlotAdapter(requireContext(), slotList)
-                    slotRecyclerView.adapter = slotAdapter
+                if (isAdded) {
+                    if (::slotAdapter.isInitialized) {
+                        slotAdapter.notifyDataSetChanged()
+                    } else {
+                        context?.let { ctx ->
+                            slotAdapter = SlotAdapter(ctx, slotList)
+                            slotRecyclerView.adapter = slotAdapter
+                        }
+                    }
                 }
             }.addOnFailureListener { e ->
-                Log.e("AdminDashboardFragment", "Error fetching slots", e)
-                Toast.makeText(requireContext(), "Failed to load slots", Toast.LENGTH_SHORT).show()
+                if (isAdded) {
+                    Log.e("AdminDashboardFragment", "Error fetching slots", e)
+                    context?.let { ctx ->
+                        Toast.makeText(ctx, "Failed to load slots", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
     }
+
 }
