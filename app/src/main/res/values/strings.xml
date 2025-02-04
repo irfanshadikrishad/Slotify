@@ -23,6 +23,9 @@
     <string name="already_have_an_account_login_here">Already have an account? Login here.</string>
     <string name="enter_organization_name_admin_only">Enter organization name (Admin only)</string>
     <string name="name">Name</string>
+    <string name="book_slot">Book Slot</string>
+    <string name="edit_slot">Edit Slot</string>
+    <string name="delete_slot">Delete Slot</string>
     <string-array name="user_roles">
         <item>User</item>
         <item>Admin</item>

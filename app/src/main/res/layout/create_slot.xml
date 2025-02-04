@@ -4,17 +4,50 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <EditText
-        android:id="@+id/slotTimeEditText"
+    <Button
+        android:id="@+id/selectDateButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints=""
-        android:hint="@string/enter_slot_time_e_g_10_00_am_11_00_am"
-        android:inputType="date" />
+        android:text="Select Date" />
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No Date Selected"
+        android:textSize="16sp" />
 
     <Button
-        android:id="@+id/saveSlotButton"
+        android:id="@+id/selectStartTimeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save_slot" />
+        android:text="Select Start Time" />
+
+    <TextView
+        android:id="@+id/startTimeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No Start Time Selected"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/selectEndTimeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select End Time" />
+
+    <TextView
+        android:id="@+id/endTimeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No End Time Selected"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/createSlotButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Slot" />
+
+
 </LinearLayout>
