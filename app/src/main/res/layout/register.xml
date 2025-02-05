@@ -32,8 +32,7 @@
     <Spinner
         android:id="@+id/roleSpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp" />
+        android:layout_height="wrap_content" />
 
     <EditText
         android:id="@+id/orgEditText"
@@ -48,6 +47,7 @@
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:text="@string/register" />
 
     <TextView

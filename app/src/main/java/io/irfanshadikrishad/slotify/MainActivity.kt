@@ -62,14 +62,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun getUserRole(callback: (String) -> Unit) {
         val userId = auth.currentUser?.uid ?: return
-        db.collection("users").document(userId).get()
-            .addOnSuccessListener { document ->
-                val role = document.getString("role") ?: "user"
-                callback(role)
-            }
-            .addOnFailureListener {
-                callback("user")
-            }
+        db.collection("users").document(userId).get().addOnSuccessListener { document ->
+            val role = document.getString("role") ?: "user"
+            callback(role)
+        }.addOnFailureListener {
+            callback("user")
+        }
     }
 
     private fun setupBottomNavigation() {
@@ -98,9 +96,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, fragment).commit()
     }
 
     private fun redirectToLogin() {
