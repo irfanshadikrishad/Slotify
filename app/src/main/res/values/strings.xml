@@ -35,6 +35,7 @@
     <string name="notifications">Notifications</string>
     <string name="profile">Profile</string>
     <string name="home">Home</string>
+    <string name="n_a">N/A</string>
     <string-array name="user_roles">
         <item>User</item>
         <item>Admin</item>
