@@ -2,6 +2,7 @@ package io.irfanshadikrishad.slotify.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -9,8 +10,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
-import io.irfanshadikrishad.slotify.fragments.AdminDashboardFragment
-import io.irfanshadikrishad.slotify.fragments.UserDashboardFragment
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -56,13 +55,10 @@ class RegisterActivity : AppCompatActivity() {
             val name = nameEditText.text.toString().trim()
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
-            val role = roleSpinner.selectedItem.toString().lowercase()  // "admin" or "user"
+            val role = roleSpinner.selectedItem.toString().lowercase()
             val orgName = orgEditText.text.toString().trim()
 
-            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            if (!validateInputs(name, email, password)) return@setOnClickListener
 
             checkIfUserExists(email) { exists ->
                 if (exists) {
@@ -76,6 +72,23 @@ class RegisterActivity : AppCompatActivity() {
         loginLink.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
+    }
+
+    private fun validateInputs(name: String, email: String, password: String): Boolean {
+        if (name.isEmpty()) {
+            Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (password.length < 6) {
+            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT)
+                .show()
+            return false
+        }
+        return true
     }
 
     private fun checkIfUserExists(email: String, callback: (Boolean) -> Unit) {
