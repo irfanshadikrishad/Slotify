@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
 import io.irfanshadikrishad.slotify.fragments.AdminDashboardFragment
@@ -63,25 +64,13 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val userId = auth.currentUser?.uid
-                        if (userId != null) {
-                            val user = hashMapOf(
-                                "name" to name,
-                                "email" to email,
-                                "role" to role,
-                                "organization" to if (role == "admin") orgName else null
-                            )
-
-                            db.collection("users").document(userId).set(user).addOnSuccessListener {
-                                    navigateBasedOnRole(role)
-                                }
-                        }
-                    } else {
-                        Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show()
-                    }
+            checkIfUserExists(email) { exists ->
+                if (exists) {
+                    Toast.makeText(this, "User already exists", Toast.LENGTH_SHORT).show()
+                } else {
+                    registerUser(name, email, password, role, orgName)
                 }
+            }
         }
 
         loginLink.setOnClickListener {
@@ -89,13 +78,54 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateBasedOnRole(role: String) {
-        val intent = if (role == "admin") {
-            Intent(this, AdminDashboardFragment::class.java)
-        } else {
-            Intent(this, UserDashboardFragment::class.java)
+    private fun checkIfUserExists(email: String, callback: (Boolean) -> Unit) {
+        auth.fetchSignInMethodsForEmail(email).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val signInMethods = task.result?.signInMethods ?: emptyList()
+                callback(signInMethods.isNotEmpty()) // If non-empty, user exists
+            } else {
+                callback(false)
+            }
         }
-        startActivity(intent)
-        finish()
+    }
+
+    private fun registerUser(
+        name: String, email: String, password: String, role: String, orgName: String
+    ) {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userId = auth.currentUser?.uid
+                if (userId != null) {
+                    val user = hashMapOf(
+                        "name" to name,
+                        "email" to email,
+                        "role" to role,
+                        "organization" to if (role == "admin") orgName else null
+                    )
+
+                    db.collection("users").document(userId).set(user).addOnSuccessListener {
+                        sendVerificationEmail()
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun sendVerificationEmail() {
+        val user: FirebaseUser? = auth.currentUser
+        user?.sendEmailVerification()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(
+                    this, "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG
+                ).show()
+                auth.signOut() // Sign out so they don't log in without verification
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+            } else {
+                Toast.makeText(this, "Failed to send verification email", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
