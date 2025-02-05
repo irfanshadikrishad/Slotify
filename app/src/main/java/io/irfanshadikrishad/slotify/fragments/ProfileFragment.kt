@@ -2,6 +2,7 @@ package io.irfanshadikrishad.slotify.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,11 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.profile, container, false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchUserProfile()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
