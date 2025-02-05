@@ -87,39 +87,50 @@ class ViewSlotActivity : AppCompatActivity() {
 
                 isBooked = bookedBy != null
                 if (isBooked) {
-                    db.collection("users").document(bookedBy!!)
-                        .get()
-                        .addOnSuccessListener { user ->
-                            val userName = user.getString("name") ?: "N/A"
-                            bookedByTextView.text = buildString {
-                                append("Booked by: ")
-                                append(userName)
-                            }
+                    db.collection("users").document(bookedBy!!).get().addOnSuccessListener { user ->
+                        val userName = user.getString("name") ?: "N/A"
+                        bookedByTextView.text = buildString {
+                            append("Booked by: ")
+                            append(userName)
                         }
-                        .addOnFailureListener {
-                            bookedByTextView.text = buildString {
-                                append("Booked by: Unknown")
-                            }
+                    }.addOnFailureListener {
+                        bookedByTextView.text = buildString {
+                            append("Booked by: Unknown")
                         }
+                    }
                 } else {
                     bookedByTextView.text = buildString {
                         append("Available")
                     }
                 }
 
-                // Determine if user is an admin or a regular user
+                // Admin: Show edit & delete buttons, hide book button
                 if (currentUserId == slotAdminId) {
-                    // Admin: Show edit & delete buttons
                     editButton.visibility = Button.VISIBLE
                     deleteButton.visibility = Button.VISIBLE
                     actionButton.visibility = Button.GONE
                 } else {
-                    // Regular user: Show book/unbook button
                     editButton.visibility = Button.GONE
                     deleteButton.visibility = Button.GONE
-                    actionButton.visibility = Button.VISIBLE
-                    actionButton.text =
-                        if (isBooked && bookedBy == currentUserId) "Unbook Slot" else "Book Slot"
+
+                    if (isBooked) {
+                        // If the current user booked the slot, show "Unbook Slot"
+                        if (bookedBy == currentUserId) {
+                            actionButton.text = buildString {
+                                append("Unbook Slot")
+                            }
+                            actionButton.visibility = Button.VISIBLE
+                        } else {
+                            // If another user booked it, hide the button
+                            actionButton.visibility = Button.GONE
+                        }
+                    } else {
+                        // If slot is available, show "Book Slot"
+                        actionButton.text = buildString {
+                            append("Book Slot")
+                        }
+                        actionButton.visibility = Button.VISIBLE
+                    }
                 }
             }
         }.addOnFailureListener {
