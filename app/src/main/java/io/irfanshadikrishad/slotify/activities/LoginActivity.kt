@@ -33,20 +33,31 @@ class LoginActivity : AppCompatActivity() {
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val userId = auth.currentUser?.uid
-                        db.collection("users").document(userId!!).get()
-                            .addOnSuccessListener { document ->
-                                val role = document.getString("role") ?: "user"
-                                val name = document.getString("name") ?: ""
+                        val user = auth.currentUser
+                        if (user != null && user.isEmailVerified) {
+                            val userId = user.uid
+                            db.collection("users").document(userId).get()
+                                .addOnSuccessListener { document ->
+                                    val role = document.getString("role") ?: "user"
+                                    val name = document.getString("name") ?: ""
 
-                                Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT)
+                                        .show()
 
-                                // Redirect to MainActivity and pass the role
-                                val intent = Intent(this, MainActivity::class.java)
-                                intent.putExtra("role", role)
-                                startActivity(intent)
-                                finish()
-                            }
+                                    // Redirect to MainActivity and pass the role
+                                    val intent = Intent(this, MainActivity::class.java)
+                                    intent.putExtra("role", role)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                        } else {
+                            Toast.makeText(
+                                this,
+                                "Please verify your email before logging in.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            auth.signOut() // Prevent access until verified
+                        }
                     } else {
                         Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
                     }
