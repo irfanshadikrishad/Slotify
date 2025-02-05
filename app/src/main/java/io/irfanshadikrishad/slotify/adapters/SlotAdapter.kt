@@ -8,12 +8,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
 import io.irfanshadikrishad.slotify.activities.ViewSlotActivity
 import io.irfanshadikrishad.slotify.models.Slot
 
 class SlotAdapter(private val context: Context, private val slotList: List<Slot>) :
     RecyclerView.Adapter<SlotAdapter.SlotViewHolder>() {
+
+    private val db = FirebaseFirestore.getInstance() // Firestore instance
 
     class SlotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
@@ -40,8 +43,25 @@ class SlotAdapter(private val context: Context, private val slotList: List<Slot>
             append(" - ")
             append(slot.endTime)
         }
-        holder.bookedByTextView.text =
-            if (slot.bookedBy != null) "Booked By: ${slot.bookedBy}" else "Available"
+
+        if (slot.bookedBy != null) {
+            // Fetch user's name from Firestore
+            db.collection("users").document(slot.bookedBy).get().addOnSuccessListener { document ->
+                val userName = document.getString("name") ?: "Unknown"
+                holder.bookedByTextView.text = buildString {
+                    append("Booked By: ")
+                    append(userName)
+                }
+            }.addOnFailureListener {
+                holder.bookedByTextView.text = buildString {
+                    append("Booked By: Unknown")
+                }
+            }
+        } else {
+            holder.bookedByTextView.text = buildString {
+                append("Available")
+            }
+        }
 
         // Click Listener: Open ViewSlotActivity
         holder.itemView.setOnClickListener {
@@ -52,10 +72,7 @@ class SlotAdapter(private val context: Context, private val slotList: List<Slot>
                 }
                 context.startActivity(intent)
             } catch (error: Exception) {
-                Toast.makeText(context, buildString {
-                    append("Error: ")
-                    append(error.toString())
-                }, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }

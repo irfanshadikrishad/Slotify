@@ -86,7 +86,26 @@ class ViewSlotActivity : AppCompatActivity() {
                 }
 
                 isBooked = bookedBy != null
-                bookedByTextView.text = if (isBooked) "Booked by: $bookedBy" else "Available"
+                if (isBooked) {
+                    db.collection("users").document(bookedBy!!)
+                        .get()
+                        .addOnSuccessListener { user ->
+                            val userName = user.getString("name") ?: "N/A"
+                            bookedByTextView.text = buildString {
+                                append("Booked by: ")
+                                append(userName)
+                            }
+                        }
+                        .addOnFailureListener {
+                            bookedByTextView.text = buildString {
+                                append("Booked by: Unknown")
+                            }
+                        }
+                } else {
+                    bookedByTextView.text = buildString {
+                        append("Available")
+                    }
+                }
 
                 // Determine if user is an admin or a regular user
                 if (currentUserId == slotAdminId) {
