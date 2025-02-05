@@ -6,9 +6,8 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import io.irfanshadikrishad.slotify.MainActivity
 import io.irfanshadikrishad.slotify.R
-import io.irfanshadikrishad.slotify.fragments.AdminDashboardFragment
-import io.irfanshadikrishad.slotify.fragments.UserDashboardFragment
 
 class LoginActivity : AppCompatActivity() {
 
@@ -39,11 +38,14 @@ class LoginActivity : AppCompatActivity() {
                             .addOnSuccessListener { document ->
                                 val role = document.getString("role") ?: "user"
                                 val name = document.getString("name") ?: ""
-                                val orgName = document.getString("organization") ?: ""
 
                                 Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT).show()
 
-                                navigateBasedOnRole(role)
+                                // Redirect to MainActivity and pass the role
+                                val intent = Intent(this, MainActivity::class.java)
+                                intent.putExtra("role", role)
+                                startActivity(intent)
+                                finish()
                             }
                     } else {
                         Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
@@ -55,15 +57,5 @@ class LoginActivity : AppCompatActivity() {
         registerLink.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
-    }
-
-    private fun navigateBasedOnRole(role: String) {
-        val intent = if (role == "admin") {
-            Intent(this, AdminDashboardFragment::class.java)
-        } else {
-            Intent(this, UserDashboardFragment::class.java)
-        }
-        startActivity(intent)
-        finish()
     }
 }
