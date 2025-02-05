@@ -5,22 +5,32 @@
     android:padding="20dp">
 
     <TextView
+        android:id="@+id/organization"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/n_a"
+        android:textSize="18sp"
+        android:textStyle="bold|italic" />
+
+    <TextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:text="@string/n_a"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/timeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/n_a"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/bookedByTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/n_a"
         android:textSize="16sp"
         android:textStyle="italic" />
 
@@ -29,6 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:backgroundTint="@color/green"
         android:text="@string/book_slot"
         android:visibility="gone" />
 
@@ -37,6 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:backgroundTint="@color/green"
         android:text="@string/edit_slot"
         android:visibility="gone" />
 

@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import io.irfanshadikrishad.slotify.R
@@ -19,6 +20,7 @@ class ViewSlotActivity : AppCompatActivity() {
     private lateinit var dateTextView: TextView
     private lateinit var timeTextView: TextView
     private lateinit var bookedByTextView: TextView
+    private lateinit var organizationTextView: TextView
     private lateinit var actionButton: Button
     private lateinit var editButton: Button
     private lateinit var deleteButton: Button
@@ -39,6 +41,7 @@ class ViewSlotActivity : AppCompatActivity() {
         dateTextView = findViewById(R.id.dateTextView)
         timeTextView = findViewById(R.id.timeTextView)
         bookedByTextView = findViewById(R.id.bookedByTextView)
+        organizationTextView = findViewById(R.id.organization)
         actionButton = findViewById(R.id.actionButton)
         editButton = findViewById(R.id.editButton)
         deleteButton = findViewById(R.id.deleteButton)
@@ -67,6 +70,10 @@ class ViewSlotActivity : AppCompatActivity() {
     }
 
     private fun loadSlotDetails() {
+        db.collection("users").document(slotAdminId!!).get().addOnSuccessListener { user ->
+            val organization = user.getString("organization").toString()
+            organizationTextView.text = organization
+        }
         db.collection("slots").document(slotId!!).get().addOnSuccessListener { document ->
             if (document.exists()) {
                 val date = document.getString("date") ?: ""
@@ -120,6 +127,12 @@ class ViewSlotActivity : AppCompatActivity() {
                                 append("Unbook Slot")
                             }
                             actionButton.visibility = Button.VISIBLE
+                            actionButton.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    this,
+                                    R.color.error
+                                )
+                            )
                         } else {
                             // If another user booked it, hide the button
                             actionButton.visibility = Button.GONE
