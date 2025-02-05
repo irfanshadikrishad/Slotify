@@ -3,32 +3,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="15dp">
 
     <TextView
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/n_a"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:textStyle="bold|italic" />
 
     <TextView
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/n_a" />
+        android:text="@string/n_a"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/role"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/n_a" />
+        android:text="@string/n_a"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/organization"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/n_a"
+        android:textSize="15sp"
         android:visibility="gone" />
 
     <Button
@@ -36,5 +40,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:backgroundTint="@color/error"
         android:text="@string/logout" />
 </LinearLayout>

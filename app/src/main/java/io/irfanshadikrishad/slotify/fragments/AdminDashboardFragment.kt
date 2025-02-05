@@ -1,6 +1,5 @@
 package io.irfanshadikrishad.slotify.fragments
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -46,6 +45,9 @@ class AdminDashboardFragment : Fragment() {
             startActivity(Intent(requireContext(), CreateSlotActivity::class.java))
         }
 
+        slotAdapter = SlotAdapter(requireContext(), slotList)
+        slotRecyclerView.adapter = slotAdapter
+
         fetchSlots()
     }
 
@@ -54,21 +56,21 @@ class AdminDashboardFragment : Fragment() {
         fetchSlots()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun fetchSlots() {
         val adminId = auth.currentUser?.uid
         if (adminId == null) {
-            context?.let { ctx ->
-                Toast.makeText(ctx, "Error: Admin not logged in", Toast.LENGTH_SHORT).show()
+            activity?.let {
+                Toast.makeText(it, "Error: Admin not logged in", Toast.LENGTH_SHORT).show()
             }
             return
         }
 
-        db.collection("slots").whereEqualTo("adminId", adminId).get()
+        db.collection("slots").whereEqualTo("adminId", adminId)
+            .get()
             .addOnSuccessListener { documents ->
                 if (!isAdded || context == null) return@addOnSuccessListener
 
-                slotList.clear()
+                val newSlotList = mutableListOf<Slot>()
                 for (document in documents) {
                     val slot = Slot(
                         id = document.id,
@@ -78,26 +80,19 @@ class AdminDashboardFragment : Fragment() {
                         endTime = document.getString("endTime") ?: "",
                         bookedBy = document.getString("bookedBy")
                     )
-                    slotList.add(slot)
+                    newSlotList.add(slot)
                 }
+
                 if (isAdded) {
-                    if (::slotAdapter.isInitialized) {
-                        slotAdapter.notifyDataSetChanged()
-                    } else {
-                        context?.let { ctx ->
-                            slotAdapter = SlotAdapter(ctx, slotList)
-                            slotRecyclerView.adapter = slotAdapter
-                        }
-                    }
+                    slotAdapter.updateData(newSlotList) // ✅ Now updates properly
                 }
             }.addOnFailureListener { e ->
                 if (isAdded) {
                     Log.e("AdminDashboardFragment", "Error fetching slots", e)
-                    context?.let { ctx ->
-                        Toast.makeText(ctx, "Failed to load slots", Toast.LENGTH_SHORT).show()
+                    activity?.let {
+                        Toast.makeText(it, "Failed to load slots", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
     }
-
 }
