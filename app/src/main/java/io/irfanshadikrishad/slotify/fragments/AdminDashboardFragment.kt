@@ -84,7 +84,7 @@ class AdminDashboardFragment : Fragment() {
                 }
 
                 if (isAdded) {
-                    slotAdapter.updateData(newSlotList) // ✅ Now updates properly
+                    slotAdapter.updateData(newSlotList)
                 }
             }.addOnFailureListener { e ->
                 if (isAdded) {

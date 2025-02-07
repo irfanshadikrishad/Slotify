@@ -3,6 +3,7 @@ package io.irfanshadikrishad.slotify.adapters
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,16 +49,16 @@ class SlotAdapter(private val context: Context, private var slotList: MutableLis
         // Fetch bookedBy user name
         if (!slot.bookedBy.isNullOrEmpty()) {
             db.collection("users").document(slot.bookedBy).get().addOnSuccessListener { document ->
-                    val userName = document.getString("name") ?: "Unknown"
-                    holder.bookedByTextView.text = buildString {
-                        append("Booked By: ")
-                        append(userName)
-                    }
-                }.addOnFailureListener {
-                    holder.bookedByTextView.text = buildString {
-                        append("Booked By: Unknown")
-                    }
+                val userName = document.getString("name") ?: "Unknown"
+                holder.bookedByTextView.text = buildString {
+                    append("Booked By: ")
+                    append(userName)
                 }
+            }.addOnFailureListener {
+                holder.bookedByTextView.text = buildString {
+                    append("Booked By: Unknown")
+                }
+            }
         } else {
             holder.bookedByTextView.text = buildString {
                 append("Available")
@@ -66,9 +67,9 @@ class SlotAdapter(private val context: Context, private var slotList: MutableLis
 
         // Fetch organization name from adminId
         db.collection("users").document(slot.adminId).get().addOnSuccessListener { user ->
-                val organization = user.getString("organization") ?: "N/A"
-                holder.organizationTextView.text = organization
-            }
+            val organization = user.getString("organization") ?: "N/A"
+            holder.organizationTextView.text = organization
+        }
 
         // Click Listener: Open ViewSlotActivity
         holder.itemView.setOnClickListener {
