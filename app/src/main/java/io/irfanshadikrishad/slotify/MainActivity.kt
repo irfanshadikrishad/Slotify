@@ -11,6 +11,7 @@ import io.irfanshadikrishad.slotify.activities.LoginActivity
 import io.irfanshadikrishad.slotify.fragments.AdminDashboardFragment
 import io.irfanshadikrishad.slotify.fragments.NotificationsFragment
 import io.irfanshadikrishad.slotify.fragments.ProfileFragment
+import io.irfanshadikrishad.slotify.fragments.SearchFragment
 import io.irfanshadikrishad.slotify.fragments.UserDashboardFragment
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adminDashboardFragment: AdminDashboardFragment
     private lateinit var userDashboardFragment: UserDashboardFragment
     private lateinit var notificationsFragment: NotificationsFragment
+    private lateinit var searchFragment: SearchFragment
     private lateinit var profileFragment: ProfileFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         adminDashboardFragment = AdminDashboardFragment()
         userDashboardFragment = UserDashboardFragment()
         notificationsFragment = NotificationsFragment()
+        searchFragment = SearchFragment()
         profileFragment = ProfileFragment()
 
         getUserRole { role ->
@@ -82,6 +85,11 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.nav_notifications -> {
                     loadFragment(notificationsFragment)
+                    true
+                }
+
+                R.id.nav_search -> {
+                    loadFragment(searchFragment)
                     true
                 }
 
