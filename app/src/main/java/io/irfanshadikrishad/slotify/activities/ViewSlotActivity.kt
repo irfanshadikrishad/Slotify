@@ -3,6 +3,7 @@ package io.irfanshadikrishad.slotify.activities
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -61,6 +62,16 @@ class ViewSlotActivity : AppCompatActivity() {
         actionButton.setOnClickListener { toggleBooking() }
         editButton.setOnClickListener { editSlot() }
         deleteButton.setOnClickListener { confirmDeleteSlot() }
+        organizationTextView.setOnClickListener {
+            Log.i("vsa1087", "Switch clicked")
+            try {
+                val intent =
+                    Intent(this, ProfileActivity::class.java).putExtra("adminID", slotAdminId)
+                startActivity(intent)
+            } catch (err: Exception) {
+                Log.i("vsa1087", "Error switch. ${err.toString()}")
+            }
+        }
     }
 
     // For refreshing slot after edit
@@ -129,8 +140,7 @@ class ViewSlotActivity : AppCompatActivity() {
                             actionButton.visibility = Button.VISIBLE
                             actionButton.setBackgroundColor(
                                 ContextCompat.getColor(
-                                    this,
-                                    R.color.error
+                                    this, R.color.error
                                 )
                             )
                         } else {
