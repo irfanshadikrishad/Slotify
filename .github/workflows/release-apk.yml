@@ -57,8 +57,8 @@ jobs:
 
       - name: Check APK
         run: |
-          ls -l app/build/outputs/apk/debug
-          ls -l app/build/outputs/apk/release
+          ls
+          ls -l app/build/outputs/apk
 
       - name: Create GitHub Release
         id: create_release
