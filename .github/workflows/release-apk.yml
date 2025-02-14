@@ -51,8 +51,6 @@ jobs:
 
       - name: Ensure App Directory Exists
         run: ls -R app/
-      - name: Ensure App/App Directory Exists
-        run: ls -R app/app/
 
       - name: Decode Keystore
         run: |
