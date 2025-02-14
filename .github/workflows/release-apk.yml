@@ -1,0 +1,109 @@
+name: Release APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Read Current Version
+        id: version
+        run: |
+          VERSION=$(grep 'versionName = ' app/build.gradle.kts | cut -d'"' -f2)
+          echo "current_version=$VERSION" >> $GITHUB_ENV
+
+      - name: Increment Patch Version
+        id: increment_version
+        run: |
+          NEW_VERSION=$(echo ${{ env.current_version }} | awk -F. '{print $1"."$2"."$3+1}')
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Update Version in build.gradle.kts
+        run: |
+          sed -i "s/versionName = .*/versionName = \"${{ env.new_version }}\"/" app/build.gradle.kts
+
+      - name: Commit Updated Version
+        run: |
+          git config --global user.name "Irfan Shadik Rishad"
+          git config --global user.email "77362427+irfanshadikrishad@users.noreply.github.com"
+          git add app/build.gradle.kts
+          git commit -m "chore: update version to ${{ env.new_version }}"
+          git push
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Ensure App Directory Exists
+        run: ls -R app/
+
+      - name: Decode Keystore
+        run: |
+          mkdir -p app  # Ensure only 'app' exists
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
+
+      - name: Debug Keystore Path
+        run: ls -R app/
+
+      - name: Debug GITHUB_WORKSPACE Path
+        run: |
+          echo "Root Dir: ${GITHUB_WORKSPACE}"
+          ls -lah ${GITHUB_WORKSPACE}/app
+
+      - name: Debug Keystore
+        run: |
+          echo "Keystore file size: $(du -h app/keystore.jks | cut -f1)"
+          keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
+
+      - name: Ensure app/app directory exists
+        run: mkdir -p $GITHUB_WORKSPACE/app/app
+
+      - name: Copy Keystore to app/app Directory
+        run: cp $GITHUB_WORKSPACE/app/keystore.jks $GITHUB_WORKSPACE/app/app/keystore.jks
+
+      - name: Build Signed APK
+        run: |
+          ./gradlew assembleRelease \
+          -Pandroid.injected.signing.store.file=app/keystore.jks \
+          -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
+          -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+          -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+
+      - name: Verify APK Path
+        run: ls -R app/build/outputs/apk/release
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.new_version }}
+          release_name: v${{ env.new_version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload APK to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: app/build/outputs/apk/release/app-release.apk
+          asset_name: slotify-v${{ env.new_version }}.apk
+          asset_content_type: application/vnd.android.package-archive
