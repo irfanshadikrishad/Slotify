@@ -70,7 +70,10 @@ jobs:
           echo "Keystore file size: $(du -h app/keystore.jks | cut -f1)"
           keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
-      - name: Move Keystore to App Directory
+      - name: Ensure app/app directory exists
+        run: mkdir -p $GITHUB_WORKSPACE/app/app
+
+      - name: Move Keystore to app/app Directory
         run: mv $GITHUB_WORKSPACE/keystore.jks $GITHUB_WORKSPACE/app/app/keystore.jks
 
       - name: Build Signed APK
