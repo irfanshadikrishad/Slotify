@@ -50,27 +50,25 @@ jobs:
         run: chmod +x gradlew
 
       - name: Ensure App Directory Exists
-        run: mkdir -p app/
+        run: mkdir -p app/app
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
+          mkdir -p app/app  # Ensure the directory exists
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/app/keystore.jks
 
       - name: Debug Keystore Path
-        run: ls -R app/
+        run: ls -R app/app/
 
       - name: Debug Keystore
         run: |
-          echo "Keystore file size: $(du -h app/keystore.jks | cut -f1)"
-          keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
-
-      - name: Check Keystore
-        run: ls -R app/
+          echo "Keystore file size: $(du -h app/app/keystore.jks | cut -f1)"
+          keytool -list -keystore app/app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Build Signed APK
         run: |
           ./gradlew assembleRelease \
-          -Pandroid.injected.signing.store.file=app/keystore.jks \
+          -Pandroid.injected.signing.store.file=app/app/keystore.jks \
           -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
           -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
           -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
