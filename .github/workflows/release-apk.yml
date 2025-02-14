@@ -70,6 +70,9 @@ jobs:
           echo "Keystore file size: $(du -h app/keystore.jks | cut -f1)"
           keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
+      - name: Move Keystore to App Directory
+        run: mv keystore.jks app/app/keystore.jks
+
       - name: Build Signed APK
         run: |
           ./gradlew assembleRelease \
