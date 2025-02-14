@@ -27,52 +27,53 @@ jobs:
         run: |
           VERSION=$(grep 'versionName = ' app/build.gradle.kts | cut -d'"' -f2)
           echo "Current version: $VERSION"
-          echo "::set-output name=current_version::$VERSION"
+          echo "current_version=$VERSION" >> $GITHUB_ENV
 
       - name: Increment Patch Version
         id: increment_version
         run: |
-          CURRENT_VERSION=${{ steps.version.outputs.current_version }}
-          NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{print $1"."$2"."$3+1}')
+          NEW_VERSION=$(echo ${{ env.current_version }} | awk -F. '{print $1"."$2"."$3+1}')
           echo "New version: $NEW_VERSION"
-          echo "::set-output name=new_version::$NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Update Version in build.gradle.kts
         run: |
-          sed -i "s/versionName = .*/versionName = \"${{ steps.increment_version.outputs.new_version }}\"/" app/build.gradle.kts
+          sed -i "s/versionName = .*/versionName = \"${{ env.new_version }}\"/" app/build.gradle.kts
 
       - name: Commit Updated Version
         run: |
           git config --global user.name "Irfan Shadik Rishad"
           git config --global user.email "77362427+irfanshadikrishad@users.noreply.github.com"
           git add app/build.gradle.kts
-          git commit -m "chore: update version to ${{ steps.increment_version.outputs.new_version }} [skip ci]"
+          git commit -m "chore: update version to ${{ env.new_version }} [skip ci]"
           git push
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Ensure App Directory Exists
+        run: mkdir -p app/
+
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/app/***.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
 
       - name: Debug Keystore
         run: |
-          echo "Keystore file size: $(du -h app/app/***.jks | cut -f1)"
-          echo "Keystore file content (first 100 characters): $(head -c 100 app/app/***.jks | base64)"
-          keytool -list -keystore app/app/***.jks -storepass ${{ secrets.STORE_PASSWORD }}
+          echo "Keystore file size: $(du -h app/keystore.jks | cut -f1)"
+          echo "Keystore file content (first 100 characters): $(head -c 100 app/keystore.jks | base64)"
+          keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Build Signed APK
         run: |
           ./gradlew assembleRelease \
-          -Pandroid.injected.signing.store.file=app/app/***.jks \
+          -Pandroid.injected.signing.store.file=app/keystore.jks \
           -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
           -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
           -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
       - name: Verify APK Path
-        run: |
-          ls -R app/build/outputs/apk/release
+        run: ls -R app/build/outputs/apk/release
 
       - name: Create GitHub Release
         id: create_release
@@ -80,8 +81,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.increment_version.outputs.new_version }}
-          release_name: v${{ steps.increment_version.outputs.new_version }}
+          tag_name: v${{ env.new_version }}
+          release_name: v${{ env.new_version }}
           draft: false
           prerelease: false
 
@@ -92,5 +93,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: app/build/outputs/apk/release/app-release.apk
-          asset_name: slotify-v${{ steps.increment_version.outputs.new_version }}.apk
+          asset_name: slotify-v${{ env.new_version }}.apk
           asset_content_type: application/vnd.android.package-archive
