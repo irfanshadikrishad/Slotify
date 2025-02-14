@@ -54,18 +54,18 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/slotify.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/app/***.jks
 
       - name: Debug Keystore
         run: |
-          echo "Keystore file size: $(du -h app/slotify.jks | cut -f1)"
-          echo "Keystore file content (first 100 characters): $(head -c 100 app/slotify.jks | base64)"
-          keytool -list -keystore app/slotify.jks -storepass ${{ secrets.STORE_PASSWORD }}
+          echo "Keystore file size: $(du -h app/app/***.jks | cut -f1)"
+          echo "Keystore file content (first 100 characters): $(head -c 100 app/app/***.jks | base64)"
+          keytool -list -keystore app/app/***.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Build Signed APK
         run: |
           ./gradlew assembleRelease \
-          -Pandroid.injected.signing.store.file=app/slotify.jks \
+          -Pandroid.injected.signing.store.file=app/app/***.jks \
           -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
           -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
           -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
