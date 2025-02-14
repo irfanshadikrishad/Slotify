@@ -65,7 +65,7 @@ jobs:
           keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Check Keystore
-        run: ls -R app/app
+        run: ls -R app/
 
       - name: Build Signed APK
         run: |
