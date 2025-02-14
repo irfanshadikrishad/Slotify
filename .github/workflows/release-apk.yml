@@ -73,8 +73,8 @@ jobs:
       - name: Ensure app/app directory exists
         run: mkdir -p $GITHUB_WORKSPACE/app/app
 
-      - name: Move Keystore to app/app Directory
-        run: mv $GITHUB_WORKSPACE/app/keystore.jks $GITHUB_WORKSPACE/app/app/keystore.jks
+      - name: Copy Keystore to app/app Directory
+        run: cp $GITHUB_WORKSPACE/app/keystore.jks $GITHUB_WORKSPACE/app/app/keystore.jks
 
       - name: Build Signed APK
         run: |
