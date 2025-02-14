@@ -64,6 +64,9 @@ jobs:
           echo "Keystore file content (first 100 characters): $(head -c 100 app/keystore.jks | base64)"
           keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
+      - name: Check Keystore
+        run: ls -R app/app
+
       - name: Build Signed APK
         run: |
           ./gradlew assembleRelease \
