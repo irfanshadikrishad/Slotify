@@ -26,14 +26,12 @@ jobs:
         id: version
         run: |
           VERSION=$(grep 'versionName = ' app/build.gradle.kts | cut -d'"' -f2)
-          echo "Current version: $VERSION"
           echo "current_version=$VERSION" >> $GITHUB_ENV
 
       - name: Increment Patch Version
         id: increment_version
         run: |
           NEW_VERSION=$(echo ${{ env.current_version }} | awk -F. '{print $1"."$2"."$3+1}')
-          echo "New version: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Update Version in build.gradle.kts
@@ -58,10 +56,12 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
 
+      - name: Debug Keystore Path
+        run: ls -R app/
+
       - name: Debug Keystore
         run: |
           echo "Keystore file size: $(du -h app/keystore.jks | cut -f1)"
-          echo "Keystore file content (first 100 characters): $(head -c 100 app/keystore.jks | base64)"
           keytool -list -keystore app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Check Keystore
