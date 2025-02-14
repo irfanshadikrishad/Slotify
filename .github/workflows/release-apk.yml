@@ -74,7 +74,7 @@ jobs:
         run: mkdir -p $GITHUB_WORKSPACE/app/app
 
       - name: Move Keystore to app/app Directory
-        run: mv $GITHUB_WORKSPACE/keystore.jks $GITHUB_WORKSPACE/app/app/keystore.jks
+        run: mv $GITHUB_WORKSPACE/app/keystore.jks $GITHUB_WORKSPACE/app/app/keystore.jks
 
       - name: Build Signed APK
         run: |
