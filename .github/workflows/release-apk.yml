@@ -60,6 +60,11 @@ jobs:
       - name: Debug Keystore Path
         run: ls -R app/
 
+      - name: Debug GITHUB_WORKSPACE Path
+        run: |
+          echo "Root Dir: ${GITHUB_WORKSPACE}"
+          ls -lah ${GITHUB_WORKSPACE}/app
+
       - name: Debug Keystore
         run: |
           echo "Keystore file size: $(du -h app/keystore.jks | cut -f1)"
